@@ -1,0 +1,11 @@
+# Dependencies
+node_modules/
+
+# Large files and logs
+project.txt
+logs/
+.env
+
+# System
+.DS_Store
+Thumbs.db
