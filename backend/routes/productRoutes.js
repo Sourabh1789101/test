@@ -1,21 +1,23 @@
-import express from 'express';
-import { protect, superadmin } from '../middleware/authMiddleware.js';
-import {
-  getAllProducts,
-  getProductById,
+const express = require('express');
+const router = express.Router();
+const { protect, authorize } = require('../middleware/authMiddleware');
+const {
+  getProducts,
+  getProduct,
   createProduct,
   updateProduct,
   deleteProduct,
-} from '../controllers/productController.js';
+  calculatePrice
+} = require('../controllers/productController');
 
-const router = express.Router();
+// Public routes
+router.get('/', getProducts);
+router.get('/:id', getProduct);
+router.post('/:id/calculate-price', calculatePrice);
 
-router.get('/', getAllProducts);
-router.get('/:id', getProductById);
+// Protected routes
+router.post('/', protect, createProduct);
+router.put('/:id', protect, updateProduct);
+router.delete('/:id', protect, authorize('superadmin'), deleteProduct);
 
-// Protected routes: Only Superadmin can create, update, or delete products
-router.post('/', protect, superadmin, createProduct);
-router.put('/:id', protect, superadmin, updateProduct);
-router.delete('/:id', protect, superadmin, deleteProduct);
-
-export default router;
+module.exports = router;

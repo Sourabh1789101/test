@@ -1,64 +1,133 @@
-import Category from '../models/Category.js';
+const Category = require('../models/Category');
 
-export const getAllCategories = async (req, res) => {
+// @desc    Get all categories
+// @route   GET /api/categories
+// @access  Public
+exports.getCategories = async (req, res) => {
   try {
-    const categories = await Category.find().sort({ order: 1 });
-    res.status(200).json({ count: categories.length, data: categories });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+    const categories = await Category.find({ isActive: true });
+
+    res.json({
+      success: true,
+      count: categories.length,
+      data: categories
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
   }
 };
 
-export const getCategoryById = async (req, res) => {
+// @desc    Get single category
+// @route   GET /api/categories/:id
+// @access  Public
+exports.getCategory = async (req, res) => {
   try {
     const category = await Category.findById(req.params.id);
-    if (!category) return res.status(404).json({ error: 'Category not found' });
-    res.status(200).json(category);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-};
 
-export const createCategory = async (req, res) => {
-  try {
-    const { name, slug, imageUrl, order, icon, color } = req.body;
-    if (!name || !slug) {
-      return res.status(400).json({ error: 'Name and slug are required' });
+    if (!category) {
+      return res.status(404).json({
+        success: false,
+        message: 'Category not found'
+      });
     }
-    const category = await Category.create({
-      name,
-      slug: slug.trim().toLowerCase().replace(/\s+/g, '-'),
-      imageUrl: imageUrl || '',
-      order: order ?? 0,
-      icon: icon || 'Package',
-      color: color || 'text-primary',
+
+    res.json({
+      success: true,
+      data: category
     });
-    res.status(201).json(category);
-  } catch (err) {
-    res.status(400).json({ error: err.message });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
   }
 };
 
-export const updateCategory = async (req, res) => {
+// @desc    Create category
+// @route   POST /api/categories
+// @access  Private
+exports.createCategory = async (req, res) => {
+  try {
+    const category = await Category.create(req.body);
+
+    res.status(201).json({
+      success: true,
+      data: category
+    });
+  } catch (error) {
+    console.error(error);
+    if (error.code === 11000) {
+      return res.status(400).json({
+        success: false,
+        message: 'Category with this name already exists'
+      });
+    }
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+};
+
+// @desc    Update category
+// @route   PUT /api/categories/:id
+// @access  Private
+exports.updateCategory = async (req, res) => {
   try {
     const category = await Category.findByIdAndUpdate(
       req.params.id,
       req.body,
       { new: true, runValidators: true }
     );
-    if (!category) return res.status(404).json({ error: 'Category not found' });
-    res.status(200).json(category);
-  } catch (err) {
-    res.status(400).json({ error: err.message });
+
+    if (!category) {
+      return res.status(404).json({
+        success: false,
+        message: 'Category not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      data: category
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
   }
 };
 
-export const deleteCategory = async (req, res) => {
+// @desc    Delete category
+// @route   DELETE /api/categories/:id
+// @access  Private
+exports.deleteCategory = async (req, res) => {
   try {
     const category = await Category.findByIdAndDelete(req.params.id);
-    if (!category) return res.status(404).json({ error: 'Category not found' });
-    res.status(200).json({ message: 'Category deleted' });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+
+    if (!category) {
+      return res.status(404).json({
+        success: false,
+        message: 'Category not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Category deleted successfully'
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
   }
 };

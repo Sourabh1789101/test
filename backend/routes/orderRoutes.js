@@ -1,15 +1,23 @@
-import express from 'express';
-import {
-  getAllOrders,
-  getOrderById,
-  createOrder,
-  updateOrder,
-} from '../controllers/orderController.js';
-
+const express = require('express');
 const router = express.Router();
-router.get('/', getAllOrders);
-router.get('/:id', getOrderById);
-router.post('/', createOrder);
-router.put('/:id', updateOrder);
+const { protect, authorize } = require('../middleware/authMiddleware');
+const {
+  getProducts,
+  getProduct,
+  createProduct,
+  updateProduct,
+  deleteProduct,
+  calculatePrice
+} = require('../controllers/productController');
 
-export default router;
+// Public routes
+router.get('/', getProducts);
+router.get('/:id', getProduct);
+router.post('/:id/calculate-price', calculatePrice);
+
+// Protected routes
+router.post('/', protect, createProduct);
+router.put('/:id', protect, updateProduct);
+router.delete('/:id', protect, authorize('superadmin'), deleteProduct);
+
+module.exports = router;

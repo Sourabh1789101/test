@@ -180,10 +180,18 @@ export function generateProducts(category: string, count: number = 30): Product[
   const products: Product[] = [];
   
   for (let i = 0; i < count && i < types.length; i++) {
-    const materials: ('aluminum' | 'pvc' | 'acrylic' | 'vinyl')[] = [];
+    const materials: Product['materials'] = [];
     const numMaterials = Math.floor(Math.random() * 3) + 2; // 2-4 materials
     
-    const allMaterials: ('aluminum' | 'pvc' | 'acrylic' | 'vinyl')[] = ['aluminum', 'pvc', 'acrylic', 'vinyl'];
+    const allMaterials: Product['materials'][number][] = [
+      'aluminum',
+      '3MM FOAMEX',
+      '1MM FOAMEX',
+      '4MM CORREX',
+      'SELF ADHESIVE VINYL',
+      'acrylic',
+      'vinyl',
+    ];
     for (let j = 0; j < numMaterials; j++) {
       const mat = allMaterials[Math.floor(Math.random() * allMaterials.length)];
       if (!materials.includes(mat)) materials.push(mat);

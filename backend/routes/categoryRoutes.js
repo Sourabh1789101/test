@@ -1,17 +1,21 @@
-import express from 'express';
-import {
-  getAllCategories,
-  getCategoryById,
+const express = require('express');
+const router = express.Router();
+const { protect, authorize } = require('../middleware/authMiddleware');
+const {
+  getCategories,
+  getCategory,
   createCategory,
   updateCategory,
-  deleteCategory,
-} from '../controllers/categoryController.js';
+  deleteCategory
+} = require('../controllers/categoryController');
 
-const router = express.Router();
-router.get('/', getAllCategories);
-router.get('/:id', getCategoryById);
-router.post('/', createCategory);
-router.put('/:id', updateCategory);
-router.delete('/:id', deleteCategory);
+// Public routes
+router.get('/', getCategories);
+router.get('/:id', getCategory);
 
-export default router;
+// Protected routes (require authentication)
+router.post('/', protect, createCategory);
+router.put('/:id', protect, updateCategory);
+router.delete('/:id', protect, authorize('superadmin'), deleteCategory);
+
+module.exports = router;

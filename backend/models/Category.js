@@ -1,15 +1,36 @@
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 
-const categorySchema = new mongoose.Schema(
-  {
-    name: { type: String, required: true, trim: true },
-    slug: { type: String, required: true, unique: true, trim: true },
-    imageUrl: { type: String, default: '' },
-    order: { type: Number, default: 0 },
-    icon: { type: String, default: 'Package' },
-    color: { type: String, default: 'text-primary' },
+const CategorySchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: [true, 'Please add a category name'],
+    unique: true,
+    trim: true
   },
-  { timestamps: true }
-);
+  slug: {
+    type: String,
+    unique: true
+  },
+  description: {
+    type: String
+  },
+  image: {
+    type: String
+  },
+  isActive: {
+    type: Boolean,
+    default: true
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now
+  }
+});
 
-export default mongoose.model('Category', categorySchema);
+// Create slug from name
+CategorySchema.pre('save', function(next) {
+  this.slug = this.name.toLowerCase().replace(/ /g, '-');
+  next();
+});
+
+module.exports = mongoose.model('Category', CategorySchema);
